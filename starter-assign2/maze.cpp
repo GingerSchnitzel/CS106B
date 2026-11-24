@@ -17,11 +17,45 @@
 using namespace std;
 
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+/*
+ * Generates and returns a set of valid neighboring locations for the
+ * given current position in the maze.
+ *
+ * A neighboring location is considered valid if it is within the maze
+ * boundaries and represents a traversable cell (true).
+ *
+ * Checks the four cardinal directions: left, right, up, and down.
+ */
 Set<GridLocation> generateValidMoves(Grid<bool>& maze, GridLocation cur) {
+
     Set<GridLocation> neighbors;
-    /* TODO: Fill in the remainder of this function. */
+    GridLocation left = {cur.row, cur.col - 1};
+    GridLocation right = {cur.row, cur.col + 1};
+    GridLocation up = {cur.row - 1, cur.col};
+    GridLocation down = {cur.row + 1, cur.col};
+
+    if (maze.inBounds(left)){
+        if (maze[left] == true){
+            // Adding GridLocations to set, not the boolean result of maze[left]
+            neighbors.add(left);
+        }
+    }
+    if (maze.inBounds(right)){
+        if (maze[right] == true){
+            neighbors.add(right);
+        }
+    }
+    if (maze.inBounds(up)){
+        if (maze[up] == true){
+            neighbors.add(up);
+        }
+    }
+    if (maze.inBounds(down)){
+        if (maze[down] == true){
+            neighbors.add(down);
+        }
+    }
+
     return neighbors;
 }
 
