@@ -1,6 +1,7 @@
 #include "queue.h"
 #include "stack.h"
 #include "SimpleTest.h"
+#include <vector>
 using namespace std;
 
 /* This function correctly reverses the elements of a queue.
@@ -26,12 +27,23 @@ void reverse(Queue<int>& q) {
  * information on how to test and diagnose.
  */
 void duplicateNegatives(Queue<int>& q) {
-    for (int i = 0; i < q.size(); i++) {
+    int originalSize = q.size();
+    vector<int> copy;
+
+    // 1. Process only the original elements
+    for (int i = 0; i < originalSize; i++) {
         int val = q.dequeue();
-        q.enqueue(val);
+
+        copy.push_back(val);
+
         if (val < 0) {
-            q.enqueue(val);   // double up on negative numbers
+            copy.push_back(val);
         }
+    }
+
+    // 2. Put everything back into the queue
+    for (int val : copy) {
+        q.enqueue(val);
     }
 }
 
@@ -40,7 +52,7 @@ void duplicateNegatives(Queue<int>& q) {
 // WARNING: the given code is buggy. See exercise writeup for more
 // information on how to test and diagnose.
 int sumStack(Stack<int> s) {
-    int total = s.pop();
+    int total = 0;
     while (!s.isEmpty()) {
         total += s.pop();
     }
