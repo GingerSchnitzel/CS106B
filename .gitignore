@@ -48,6 +48,7 @@ CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 Makefile
+!Library/resources/Makefile
 install_manifest.txt
 compile_commands.json
 
@@ -66,3 +67,31 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# macOS
+.DS_Store
+._*
+
+# Qt / Qt Creator
+*.pro.user
+*.pro.user.*
+*.qmake.stash
+CMakeLists.txt.user
+.qtc_clangd/
+*.moc
+moc_*.cpp
+!Library/graphics/moc_unity.cpp
+qrc_*.cpp
+ui_*.h
+*.qmlc
+*.jsc
+*.qm
+*.prl
+debug/
+release/
+
+# C++ / IDE
+.idea/
+*.dSYM/
+*.orig
+*.rej
