@@ -110,15 +110,80 @@ void validatePath(Grid<bool>& maze, Vector<GridLocation>& path) {
     }
 }
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+/*
+ * Finds the shortest path through a maze using Breadth-First Search (BFS).
+ * Maintains a queue of possible paths, exploring them in order of length.
+ * Uses a Set to keep track of visited locations and avoid exploring
+ * the same location more than once. Returns the first path that reaches
+ * the maze exit, or an empty path if no solution is found.
+ */
 Vector<GridLocation> solveMazeBFS(Grid<bool>& maze) {
-    Vector<GridLocation> path;
+    drawMaze(maze);
+
+    // 1. Create an empty queue of paths.
     Queue<Vector<GridLocation>> allPaths;
 
-    drawMaze(maze);
-    /* TODO: Fill in the remainder of this function. */
-    return path;
+    // 2. Create the initial path containing {0, 0}.
+    Vector<GridLocation> entry;
+    entry.add({0, 0});
+
+    // 3. Enqueue the initial path.
+    allPaths.enqueue(entry);
+
+    // 4. Create a collection of visited locations.
+    Set<GridLocation> visited;
+
+    // Mark {0, 0} as visited.
+    visited.add({0, 0});
+
+    // 5. While the queue isn't empty:
+    while (!allPaths.isEmpty()) {
+
+        // a. Dequeue the first path.
+        Vector<GridLocation> currentPath = allPaths.dequeue();
+
+        // b. Get its last location.
+        GridLocation current = currentPath.get(currentPath.size() - 1);
+
+        // c. If this location is the exit:
+        GridLocation exit = {maze.numRows() - 1, maze.numCols() - 1};
+
+        if (current == exit) {
+            highlightPath(currentPath, "Green", 2000);
+            // Return the current path.
+            return currentPath;
+
+        }
+
+        // d. Find all valid neighboring locations.
+        Set<GridLocation> neighbors = generateValidMoves(maze, current);
+
+        // e. For each neighbor:
+        for (GridLocation neighbor : neighbors) {
+
+            // Check if this location hasn't been visited.
+            if (!visited.contains(neighbor)) {
+
+                // Mark it as visited.
+                visited.add(neighbor);
+
+                // Copy the current path.
+                Vector<GridLocation> newPath = currentPath;
+
+                // Add the neighbor to the copied path.
+                newPath.add(neighbor);
+
+                // Enqueue the new path.
+                allPaths.enqueue(newPath);
+
+                // Visualize the newly extended path.
+                highlightPath(newPath, "Green", 500);
+            }
+        }
+    }
+
+    // 6. Return an empty path if no solution is found.
+    return {};
 }
 
 // TODO: Add a function header comment here to explain the
