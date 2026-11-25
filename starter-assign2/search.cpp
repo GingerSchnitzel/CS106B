@@ -35,10 +35,23 @@ string cleanToken(string s) {
     return s;
 }
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+/*
+ * Splits the input text into individual words, cleans each word using
+ * cleanToken(), and stores the resulting non-empty tokens in a Set.
+ * Duplicate tokens are automatically eliminated by the Set.
+ */
 Set<string> gatherTokens(string text) {
     Set<string> tokens;
+    Vector<string> split = stringSplit(text, " ");
+
+    for (string word : split) {
+        string cleaned = cleanToken(word);
+
+        if (!cleaned.empty()) {
+            tokens.add(cleaned);
+        }
+    }
+
     return tokens;
 }
 
@@ -149,4 +162,20 @@ STUDENT_TEST("cleanToken handles empty and unusual input") {
     EXPECT_EQUAL(cleanToken("!!!"), "");
     EXPECT_EQUAL(cleanToken("   "), "");
     EXPECT_EQUAL(cleanToken("A"), "a");
+}
+
+STUDENT_TEST("gatherTokens basic tests") {
+    EXPECT_EQUAL(gatherTokens("Hello World"), {"hello", "world"});
+    EXPECT_EQUAL(gatherTokens("Hello, World!"), {"hello", "world"});
+    EXPECT_EQUAL(gatherTokens("Hello Hello"), {"hello"});
+}
+
+STUDENT_TEST("gatherTokens handles punctuation and numbers") {
+    EXPECT_EQUAL(gatherTokens("CS106B is fun!"), {"cs106b", "is", "fun"});
+    EXPECT_EQUAL(gatherTokens("One, two, three."), {"one", "two", "three"});
+}
+
+STUDENT_TEST("gatherTokens handles empty input") {
+    EXPECT_EQUAL(gatherTokens(""), {});
+    EXPECT_EQUAL(gatherTokens("!!!"), {});
 }
