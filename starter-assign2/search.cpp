@@ -12,13 +12,26 @@
 #include "simpio.h"
 #include "strlib.h"
 #include "vector.h"
+#include <algorithm>
+#include <cctype>
 #include "SimpleTest.h" // IWYU pragma: keep (needed to quiet spurious warning)
 using namespace std;
 
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+// Removes all non-alphanumeric characters and converts
+// all remaining characters to lowercase.
 string cleanToken(string s) {
+    s.erase(
+        remove_if(s.begin(), s.end(), [](unsigned char c) {
+            return !isalnum(c);
+        }),
+        s.end()
+        );
+
+    for (char& c : s) {
+        c = tolower(static_cast<unsigned char>(c));
+    }
+
     return s;
 }
 
@@ -115,3 +128,25 @@ PROVIDED_TEST("findQueryMatches from tiny.txt, compound queries") {
 
 
 // TODO: add your test cases here
+STUDENT_TEST("cleanToken removes punctuation") {
+    EXPECT_EQUAL(cleanToken("Hello, World!"), "helloworld");
+    EXPECT_EQUAL(cleanToken("Don't stop!"), "dontstop");
+    EXPECT_EQUAL(cleanToken("a-b_c"), "abc");
+}
+
+STUDENT_TEST("cleanToken converts uppercase to lowercase") {
+    EXPECT_EQUAL(cleanToken("HELLO"), "hello");
+    EXPECT_EQUAL(cleanToken("HeLLo WoRLd"), "helloworld");
+}
+
+STUDENT_TEST("cleanToken handles numbers") {
+    EXPECT_EQUAL(cleanToken("CS106B"), "cs106b");
+    EXPECT_EQUAL(cleanToken("123-456"), "123456");
+}
+
+STUDENT_TEST("cleanToken handles empty and unusual input") {
+    EXPECT_EQUAL(cleanToken(""), "");
+    EXPECT_EQUAL(cleanToken("!!!"), "");
+    EXPECT_EQUAL(cleanToken("   "), "");
+    EXPECT_EQUAL(cleanToken("A"), "a");
+}
