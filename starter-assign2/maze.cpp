@@ -189,12 +189,72 @@ Vector<GridLocation> solveMazeBFS(Grid<bool>& maze) {
 // TODO: Add a function header comment here to explain the
 // behavior of the function and how you implemented this behavior
 Vector<GridLocation> solveMazeDFS(Grid<bool>& maze) {
-    Vector<GridLocation> path;
+    drawMaze(maze);
+
+    // 1. Create an empty Stack of paths.
     Stack<Vector<GridLocation>> allPaths;
 
-    drawMaze(maze);
-    /* TODO: Fill in the remainder of this function. */
-    return path;
+    // 2. Create the initial path containing {0, 0}.
+    Vector<GridLocation> entry;
+    entry.add({0, 0});
+
+    // 3. push the initial path.
+    allPaths.push(entry);
+
+    // 4. Create a collection of visited locations.
+    Set<GridLocation> visited;
+
+    // Mark {0, 0} as visited.
+    visited.add({0, 0});
+
+    // 5. While the Stack isn't empty:
+    while (!allPaths.isEmpty()) {
+
+        // a. pop the first path.
+        Vector<GridLocation> currentPath = allPaths.pop();
+
+        // b. Get its last location.
+        GridLocation current = currentPath.get(currentPath.size() - 1);
+
+        // c. If this location is the exit:
+        GridLocation exit = {maze.numRows() - 1, maze.numCols() - 1};
+
+        if (current == exit) {
+            highlightPath(currentPath, "Green", 2000);
+            // Return the current path.
+            return currentPath;
+
+        }
+
+        // d. Find all valid neighboring locations.
+        Set<GridLocation> neighbors = generateValidMoves(maze, current);
+
+        // e. For each neighbor:
+        for (GridLocation neighbor : neighbors) {
+
+            // Check if this location hasn't been visited.
+            if (!visited.contains(neighbor)) {
+
+                // Mark it as visited.
+                visited.add(neighbor);
+
+                // Copy the current path.
+                Vector<GridLocation> newPath = currentPath;
+
+                // Add the neighbor to the copied path.
+                newPath.add(neighbor);
+
+                // push the new path.
+                allPaths.push(newPath);
+
+                // Visualize the newly extended path.
+                highlightPath(newPath, "Green", 500);
+            }
+        }
+    }
+
+    // 6. Return an empty path if no solution is found.
+    return {};
 }
 
 /*
@@ -334,4 +394,115 @@ PROVIDED_TEST("solveMazeDFS on file 21x23") {
     EXPECT_NO_ERROR(validatePath(maze, soln));
 }
 
-// TODO: add your test cases here
+
+/* * * * * * Student Test Cases * * * * * */
+
+// A maze with only one open cell.
+// The entrance and exit are the same location.
+STUDENT_TEST("solveMazeBFS on 1x1 maze") {
+    Grid<bool> maze = {{true}};
+
+    Vector<GridLocation> soln = solveMazeBFS(maze);
+
+    Vector<GridLocation> expected = {{0, 0}};
+    EXPECT_EQUAL(soln, expected);
+}
+
+// A maze with only one possible route to the exit.
+STUDENT_TEST("solveMazeBFS on maze with only one possible path") {
+    Grid<bool> maze = {
+        {true,  false, false},
+        {true,  true,  false},
+        {false, true,  true}
+    };
+
+    Vector<GridLocation> soln = solveMazeBFS(maze);
+
+    Vector<GridLocation> expected = {
+        {0, 0}, {1, 0}, {1, 1}, {2, 1}, {2, 2}
+    };
+
+    EXPECT_EQUAL(soln, expected);
+    EXPECT_NO_ERROR(validatePath(maze, soln));
+}
+
+// A maze with multiple possible routes to the exit.
+// BFS should return a shortest path.
+STUDENT_TEST("solveMazeBFS finds shortest path") {
+    Grid<bool> maze = {
+        {true, true,  true},
+        {true, true,  true},
+        {true, true,  true}
+    };
+
+    Vector<GridLocation> soln = solveMazeBFS(maze);
+
+    // The shortest path from (0,0) to (2,2) requires 4 moves.
+    EXPECT_EQUAL(soln.size(), 5);
+    EXPECT_NO_ERROR(validatePath(maze, soln));
+}
+
+// A maze where the exit cannot be reached.
+STUDENT_TEST("solveMazeBFS on maze with no solution") {
+    Grid<bool> maze = {
+        {true,  false},
+        {false, true}
+    };
+
+    Vector<GridLocation> soln = solveMazeBFS(maze);
+
+    EXPECT_EQUAL(soln.size(), 0);
+}
+
+// DFS should also find a valid path when one exists.
+STUDENT_TEST("solveMazeDFS on maze with only one possible path") {
+    Grid<bool> maze = {
+        {true,  false, false},
+        {true,  true,  false},
+        {false, true,  true}
+    };
+
+    Vector<GridLocation> soln = solveMazeDFS(maze);
+
+    EXPECT_NO_ERROR(validatePath(maze, soln));
+}
+
+// DFS should return an empty path when the exit is unreachable.
+STUDENT_TEST("solveMazeDFS on maze with no solution") {
+    Grid<bool> maze = {
+        {true,  false},
+        {false, true}
+    };
+
+    Vector<GridLocation> soln = solveMazeDFS(maze);
+
+    EXPECT_EQUAL(soln.size(), 0);
+}
+
+// A path that revisits a location should be rejected.
+STUDENT_TEST("validatePath rejects repeated locations") {
+    Grid<bool> maze = {
+        {true, true},
+        {true, true}
+    };
+
+    Vector<GridLocation> soln = {
+        {0, 0}, {0, 1}, {1, 1}, {1, 0},
+        {0, 0}, {1, 0}, {1, 1}
+    };
+
+    EXPECT_ERROR(validatePath(maze, soln));
+}
+
+// An empty path should be rejected.
+STUDENT_TEST("validatePath rejects empty path") {
+    Grid<bool> maze = {
+        {true, true},
+        {true, true}
+    };
+
+    Vector<GridLocation> soln;
+
+    EXPECT_ERROR(validatePath(maze, soln));
+}
+
