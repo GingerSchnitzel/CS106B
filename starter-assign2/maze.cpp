@@ -59,18 +59,55 @@ Set<GridLocation> generateValidMoves(Grid<bool>& maze, GridLocation cur) {
     return neighbors;
 }
 
-// TODO: Add a function header comment here to explain the
-// behavior of the function and how you implemented this behavior
+/*
+ * Validates that the given path is a valid solution through the maze.
+ * Checks that the path is not empty, starts at the upper-left corner,
+ * ends at the bottom-right corner, consists only of valid moves,
+ * and does not contain repeated locations.
+ */
 void validatePath(Grid<bool>& maze, Vector<GridLocation>& path) {
+
+    // A valid path must contain at least one location.
     if (path.isEmpty()) {
         error("Path is empty!");
     }
-    /* TODO: Fill in the remainder of this function. */
 
-    /* If you find a problem with the path, call error() to report it.
-     * If the path is a valid solution, then this function should run to completion
-     * without raising any errors.
-     */
+    // The path must start at the maze entrance (row 0, column 0).
+    if (path[0] != GridLocation{0, 0}) {
+        error("Path does not start at the maze entrance.");
+    }
+
+    // The path must end at the maze exit (bottom-right corner).
+    if (path[path.size() - 1] != GridLocation{maze.numRows() - 1,
+                                              maze.numCols() - 1}) {
+        error("Path does not end at the maze exit.");
+    }
+
+    Set<GridLocation> visited;
+
+    // Check every location in the path for duplicates and valid movements.
+    for (int i = 0; i < path.size(); ++i) {
+
+        // Check whether this location has already been visited.
+        if (visited.contains(path[i])) {
+            error("Path contains a loop!");
+        }
+
+        // Record this location.
+        visited.add(path[i]);
+
+        // The first location has no previous location to check against.
+        if (i > 0) {
+
+            // Generate all possible valid moves from the previous location.
+            Set<GridLocation> validMoves = generateValidMoves(maze, path[i - 1]);
+
+            // Check whether the current location is a valid move.
+            if (!validMoves.contains(path[i])) {
+                error("Invalid move in path.");
+            }
+        }
+    }
 }
 
 // TODO: Add a function header comment here to explain the
